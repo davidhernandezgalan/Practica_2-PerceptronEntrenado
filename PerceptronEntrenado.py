@@ -97,3 +97,22 @@ class PerceptronGUI(tk.Tk):
         for x, y, label in self.points:
             color = 'bo' if label == 1 else 'ro'
             self.ax.plot(x, y, color, markersize=12)   
+
+            # Dibujar hiperplano
+        x_vals = np.array(self.ax.get_xlim())
+        if self.weights[1] != 0:
+            y_vals = - (self.weights[0] / self.weights[1]) * x_vals - (self.weights[2] / self.weights[1])
+            self.ax.plot(x_vals, y_vals, 'g--')
+
+        self.canvas.draw()
+
+        # Actualizar etiquetas
+        self.w1_label.config(text=f"Peso w1: {self.weights[0]:.1f}")
+        self.w2_label.config(text=f"Peso w2: {self.weights[1]:.1f}")
+        self.bias_label.config(text=f"Bias w0: {self.weights[2]:.1f}")
+        
+        #Errores
+        if not error_occurred:
+            messagebox.showinfo("Correcto", f"Se clasificaron exitosamente los puntos en la época {self.epoch + 1}")
+        else:
+            self.epoch += 1
