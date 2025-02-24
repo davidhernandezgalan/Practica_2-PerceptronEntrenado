@@ -50,3 +50,50 @@ class PerceptronGUI(tk.Tk):
 
         # Manejo de cierre
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    # Marcar puntos en el plano
+    def add_point(self, event):
+        if event.inaxes:
+            x, y = round(event.xdata), round(event.ydata)
+            
+            # Clic izquierdo para clase -1 (rojo), clic derecho para clase 1 (azul)
+            if event.button == 1:
+                self.points.append((x, y, -1))
+                self.ax.plot(x, y, 'ro', markersize=12) #Color rojo
+            elif event.button == 3:
+                self.points.append((x, y, 1))
+                self.ax.plot(x, y, 'bo', markersize=12) #Color azul
+            
+            self.canvas.draw()
+
+    # Algoritmo del perceptrón
+    def advance_epoch(self):
+        if not self.points:
+            messagebox.showwarning("Error", "Ingresa Puntos al plano para continuar.")
+            return
+
+        error_occurred = False
+        #Recorre los puntos y aplica el algoritmo de correccion de error
+        for x, y, label in self.points:
+            input_vector = np.array([x, y, 1]) #Añade BIAS
+            prediction = np.dot(self.weights, input_vector) #Calcula la salida del perceptron
+            predicted_label = 1 if prediction >= 0 else -1
+            
+            #Actualiza pesos si esta incorrecta
+            if predicted_label != label:
+                error_occurred = True
+                self.weights += self.learning_rate * (label - predicted_label) * input_vector
+
+        # Redibujar el gráfico con los nuevos pesos
+        self.ax.clear()
+        self.ax.set_xlim(-10, 10)
+        self.ax.set_ylim(-10, 10)
+        self.ax.set_xticks(np.arange(-10, 11, 1))
+        self.ax.set_yticks(np.arange(-10, 11, 1))
+        self.ax.grid(True, which='both', linestyle='--', linewidth=0.5)
+        self.ax.axhline(0, color='black', linewidth=0.5)
+        self.ax.axvline(0, color='black', linewidth=0.5)
+        
+        for x, y, label in self.points:
+            color = 'bo' if label == 1 else 'ro'
+            self.ax.plot(x, y, color, markersize=12)   
