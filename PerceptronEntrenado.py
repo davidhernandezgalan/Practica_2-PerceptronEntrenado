@@ -116,3 +116,13 @@ class PerceptronGUI(tk.Tk):
             messagebox.showinfo("Correcto", f"Se clasificaron exitosamente los puntos en la época {self.epoch + 1}")
         else:
             self.epoch += 1
+
+     #Cerra figura y ventana
+    def on_closing(self):
+        plt.close(self.figure)
+        self.destroy()
+
+#Ejecutar aplicación
+if __name__ == "__main__":
+    app = PerceptronGUI()
+    app.mainloop()       
